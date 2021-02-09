@@ -16,6 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from peoplefinder.views.home import home
+from peoplefinder.views.profile import ProfileDetailView
+from peoplefinder.views.team import TeamDetailView, TeamTreeView, TeamPeopleView
+
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", home),
+    path("people/<pk>/", ProfileDetailView.as_view()),
+    path("teams/<slug>", TeamDetailView.as_view()),
+    path("teams/<slug>/tree", TeamTreeView.as_view()),
+    path("teams/<slug>/people", TeamPeopleView.as_view()),
 ]

@@ -7,12 +7,23 @@ class User(AbstractUser):
 
 
 class Team(models.Model):
-    people = models.ManyToManyField("User", through="TeamMember")
+    people = models.ManyToManyField("User", through="TeamMember", related_name="teams")
 
     name = models.CharField(max_length=255, unique=True)
+    abbreviation = models.CharField(max_length=10, null=True)
+    slug = models.SlugField(max_length=100)
 
     def __str__(self) -> str:
-        return self.name
+        return self.short_name
+
+    @property
+    def short_name(self) -> str:
+        """Return a short name for the team.
+
+        Returns:
+            str: The team's short name.
+        """
+        return self.abbreviation or self.name
 
 
 class TeamMember(models.Model):

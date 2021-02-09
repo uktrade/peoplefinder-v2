@@ -23,7 +23,7 @@ def test_team_service(db):
     team_service.add_team(team=gti_investment, parent=gti)
     team_service.add_team(team=gti_defence, parent=gti)
 
-    assert list(team_service.get_all_child_teams(team=dit)) == [
+    assert list(team_service.get_all_child_teams(parent=dit)) == [
         coo,
         gti,
         coo_analysis,
@@ -32,4 +32,8 @@ def test_team_service(db):
         gti_defence,
     ]
 
-    assert list(team_service.get_immediate_child_teams(team=dit)) == [coo, gti]
+    assert list(team_service.get_immediate_child_teams(parent=dit)) == [coo, gti]
+
+    assert list(team_service.get_all_parent_teams(child=coo_change)) == [dit, coo]
+
+    assert team_service.get_root_team() == dit

@@ -1,4 +1,4 @@
-from django.db.models import QuerySet
+from django.db.models import Subquery, QuerySet
 
 from peoplefinder.models import Team, TeamTree
 
@@ -46,3 +46,30 @@ class TeamService:
             QuerySet: A queryset of teams.
         """
         return Team.objects.filter(children__parent=parent, children__depth=1)
+
+    def get_all_parent_teams(self, child: Team) -> QuerySet:
+        """Return all parent teams for the given child team.
+
+        Args:
+            child (Team): The given child team.
+
+        Returns:
+            QuerySet: A query of teams.
+        """
+        return (
+            Team.objects.filter(parents__child=child).exclude(parents__parent=child)
+            # TODO: Not sure if we should order here or at the call sites.
+            .order_by("-parents__depth")
+        )
+
+    def get_root_team(self) -> Team:
+        """Return the root team.
+
+        Returns:
+            Team: The root team.
+        """
+        teams_with_parents = TeamTree.objects.filter(depth__gt=0)
+
+        return Team.objects.exclude(
+            id__in=Subquery(teams_with_parents.values("child"))
+        ).get()

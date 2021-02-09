@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block page %}
+<a href="/">Home</a>
+{% for team in parent_teams %}
+<a href="/teams/{{ team.slug }}">{{ team.short_name }}</a>
+{% endfor %}
+{% block content %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'peoplefinder/page.html' %}
+
+{% block content %}
+{% if team.abbreviation %}
+<p>{{ team.abbreviation }}</p>
+{% endif %}
+<h1>{{ team.name }}</h1>
+
+{% if sub_teams %}
+<h2>Teams within {{ team.short_name }}</h2>
+<p>
+    <a href="/teams/{{ team.slug }}/tree">View all sub-teams</a>
+    <a href="/teams/{{ team.slug }}/people">View all people</a>
+</p>
+<ul>
+    {% for team in sub_teams %}
+    <li><a href="/teams/{{ team.slug }}">{{ team.name }}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+<h2>People in {{ team.short_name }}</h2>
+<ul>
+    {% for user in people %}
+    <li><a href="/people/{{ user.id }}">{{ user.username }}</a></li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

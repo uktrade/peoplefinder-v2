@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -x
+
+black --check --exclude "(migrations|manage\.py)" .
+
+flake8
+
+mypy intranet peoplefinder

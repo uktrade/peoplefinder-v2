@@ -37,3 +37,19 @@ def test_team_service(db):
     assert list(team_service.get_all_parent_teams(child=coo_change)) == [dit, coo]
 
     assert team_service.get_root_team() == dit
+
+    assert team_service.get_immediate_parent_team(gti_defence) == gti
+
+    team_service.update_team_parent(gti, coo)
+
+    assert team_service.get_immediate_parent_team(gti) == coo
+
+    assert list(team_service.get_all_child_teams(coo)) == [
+        gti,
+        coo_analysis,
+        coo_change,
+        gti_investment,
+        gti_defence,
+    ]
+
+    assert list(team_service.get_immediate_child_teams(dit)) == [coo]

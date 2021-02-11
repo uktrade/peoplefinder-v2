@@ -1,3 +1,6 @@
+from typing import Optional
+
+from django.db import transaction, connection
 from django.db.models import Subquery, QuerySet
 
 from peoplefinder.models import Team, TeamTree
@@ -22,6 +25,40 @@ class TeamService:
                 ),
             ]
         )
+
+    @transaction.atomic
+    def update_team_parent(self, team: Team, parent: Team) -> None:
+        """Update a team's parent with the given parent team.
+
+        The implementation was informed by the following blog:
+        https://www.percona.com/blog/2011/02/14/moving-subtrees-in-closure-table/
+
+        Args:
+            team (Team): The team to be updated.
+            parent (Team): The given parent team.
+        """
+        TeamTree.objects.filter(
+            child__in=Subquery(TeamTree.objects.filter(parent=team).values("child"))
+        ).exclude(
+            parent__in=Subquery(TeamTree.objects.filter(parent=team).values("child"))
+        ).delete()
+
+        with connection.cursor() as c:
+            c.execute(
+                """
+                INSERT INTO peoplefinder_teamtree (parent_id, child_id, depth)
+                SELECT
+                    supertree.parent_id,
+                    subtree.child_id,
+                    (supertree.depth + subtree.depth + 1)
+                FROM peoplefinder_teamtree AS supertree
+                INNER JOIN peoplefinder_teamtree AS subtree
+                WHERE
+                    subtree.parent_id = %s
+                    AND supertree.child_id = %s
+                """,
+                [team.id, parent.id],
+            )
 
     def get_all_child_teams(self, parent: Team) -> QuerySet:
         """Return all child teams of the given parent team.
@@ -61,6 +98,20 @@ class TeamService:
             # TODO: Not sure if we should order here or at the call sites.
             .order_by("-parents__depth")
         )
+
+    def get_immediate_parent_team(self, child: Team) -> Optional[Team]:
+        """Return the immediate parent team for the given team.
+
+        Args:
+            child (Team): The given team.
+
+        Returns:
+            Team: The immediate parent team.
+        """
+        try:
+            return Team.objects.filter(parents__child=child, parents__depth=1).get()
+        except Team.DoesNotExist:
+            return None
 
     def get_root_team(self) -> Team:
         """Return the root team.

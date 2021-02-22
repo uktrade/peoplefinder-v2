@@ -1,7 +1,11 @@
 {% extends 'peoplefinder/page.html' %}
 
 {% block content %}
-<h1>{{ user.username }}</h1>
-<p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
+<h1>{{ profile.username }}</h1>
+{% if profile == user %}
+<p><a href="/people/{{ profile.id }}/edit">Edit profile</a></p>
+{% endif %}
+<p><a href="mailto:{{ profile.email }}">{{ profile.email }}</a></p>
+<p><a href="/people/{{ profile.manager.id }}">{{ profile.manager.username }}</a></p>
 <p><a href="/teams/{{ team.slug }}">{{ team.name }}</a></p>
 {% endblock %}

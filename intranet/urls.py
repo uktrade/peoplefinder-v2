@@ -17,15 +17,16 @@ from django.contrib import admin
 from django.urls import path
 
 from peoplefinder.views.home import home
-from peoplefinder.views.profile import ProfileDetailView
+from peoplefinder.views.profile import ProfileDetailView, ProfileEditView
 from peoplefinder.views.team import TeamDetailView, TeamTreeView, TeamPeopleView
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", home),
-    path("people/<pk>/", ProfileDetailView.as_view()),
-    path("teams/<slug>", TeamDetailView.as_view()),
-    path("teams/<slug>/tree", TeamTreeView.as_view()),
-    path("teams/<slug>/people", TeamPeopleView.as_view()),
+    path("", home, name="home"),
+    path("people/<pk>/", ProfileDetailView.as_view(), name="profile-view"),
+    path("people/<pk>/edit", ProfileEditView.as_view(), name="profile-edit"),
+    path("teams/<slug>", TeamDetailView.as_view(), name="team-view"),
+    path("teams/<slug>/tree", TeamTreeView.as_view(), name="team-tree"),
+    path("teams/<slug>/people", TeamPeopleView.as_view(), name="team-people"),
 ]

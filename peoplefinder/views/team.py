@@ -41,7 +41,6 @@ class TeamTreeView(DetailView):
         team_service = TeamService()
 
         context["parent_teams"] = team_service.get_all_parent_teams(team)
-        context["sub_teams"] = team_service.get_all_child_teams(team)
 
         return context
 

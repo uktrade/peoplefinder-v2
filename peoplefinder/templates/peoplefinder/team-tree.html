@@ -1,11 +1,8 @@
 {% extends 'peoplefinder/page.html' %}
+{% load sub_teams_tree %}
 
 {% block content %}
 <h1>All sub-teams</h1>
 
-<ul>
-    {% for team in sub_teams %}
-    <li><a href="/teams/{{ team.slug }}">{{ team.name }}</a></li>
-    {% endfor %}
-</ul>
+{% sub_teams_tree team %}
 {% endblock %}

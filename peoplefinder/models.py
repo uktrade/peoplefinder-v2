@@ -1,9 +1,17 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.urls import reverse
 
 
 class User(AbstractUser):
-    pass
+    manager = models.ForeignKey(
+        "User", models.SET_NULL, null=True, blank=True, related_name="+"
+    )
+
+    do_not_work_for_dit = models.BooleanField(default=False)
+
+    def get_absolute_url(self) -> str:
+        return reverse("profile-view", kwargs={"pk": self.pk})
 
 
 class Team(models.Model):
@@ -29,6 +37,9 @@ class Team(models.Model):
 class TeamMember(models.Model):
     person = models.ForeignKey("User", models.CASCADE)
     team = models.ForeignKey("Team", models.CASCADE)
+
+    job_title = models.CharField(max_length=100)
+    head_of_team = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"{self.team} - {self.person}"
